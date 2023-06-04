@@ -1,0 +1,15 @@
+services:
+  torch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    runtime: nvidia
+    volumes:
+      - .:/root/vid2avatar
+    ipc: host
+    tty: True
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
