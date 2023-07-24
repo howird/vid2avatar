@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 import argparse
 
-def get_center_point(num_cams,cameras):
+
+def get_center_point(num_cams, cameras):
     A = np.zeros((3 * num_cams, 3 + num_cams))
     b = np.zeros((3 * num_cams, 1))
     camera_centers=np.zeros((3,num_cams))
@@ -25,7 +26,8 @@ def get_center_point(num_cams,cameras):
 
     return camera_centers
 
-def normalize_cameras(original_cameras_filename,output_cameras_filename,num_of_cameras, scene_bounding_sphere=3.0):
+
+def normalize_cameras(original_cameras_filename, output_cameras_filename, num_of_cameras, scene_bounding_sphere=3.0):
     cameras = np.load(original_cameras_filename)
     if num_of_cameras==-1:
         all_files=cameras.files

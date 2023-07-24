@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
+FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
 
 # Set up dependencies
 RUN apt-get update && \
@@ -15,12 +15,30 @@ RUN pip install --no-cache-dir torch==1.11.0+cu113 torchvision==0.12.0+cu113 -f 
 RUN pip install --no-cache-dir kaolin -f https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-1.11.0_cu113.html
 RUN pip install --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu113_pyt1110/download.html
 
-# install requirements
+# Set up OpenPose
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends cmake ffmpeg \ 
+    libboost-all-dev protobuf-compiler libprotobuf-dev \
+    libgoogle-glog-dev libopencv-dev python3-opencv \
+    libhdf5-serial-dev libatlas-base-dev libleveldb-dev \
+    libgflags-dev
+RUN cd / && git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose && \
+    cd openpose && git submodule update --init --recursive --remote && \
+    mkdir build && cd build && cmake .. -DBUILD_PYTHON=ON && make && \
+    cd python && make install && \
+    echo "export PYTHONPATH=\"\${PYTHONPATH}:/openpose/build/python\"" \
+    >> /root/.bashrc
+
+# install vid2avatar requirements
 COPY . /root/vid2avatar
 WORKDIR /root/vid2avatar
 RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir -r requirements.docker.txt
 WORKDIR /root/vid2avatar/code
 RUN python setup.py develop
+
+# preprocessing dependencies
+RUN pip install simple-romp scikit-learn
 
 WORKDIR /root/vid2avatar
