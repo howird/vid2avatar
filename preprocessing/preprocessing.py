@@ -11,6 +11,7 @@ from preprocessing_utils import (smpl_to_pose, PerspectiveCamera, Renderer, rend
                                 estimate_translation_cv2, transform_smpl)
 from loss import joints_2d_loss, pose_temporal_loss, get_loss_weights
 
+
 def main(args):
     device = torch.device("cuda:0")
     seq = args.seq
@@ -248,6 +249,7 @@ def main(args):
         np.save(os.path.join(save_dir, 'mean_shape.npy'), smpl_shape)
         np.save(os.path.join(save_dir, 'normalize_trans.npy'), np.array(output_trans))
         np.savez(os.path.join(save_dir, "cameras.npz"), **output_P)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Preprocessing data")

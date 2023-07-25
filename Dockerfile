@@ -30,15 +30,10 @@ RUN cd / && git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose &
     echo "export PYTHONPATH=\"\${PYTHONPATH}:/openpose/build/python\"" \
     >> /root/.bashrc
 
-# install vid2avatar requirements
-COPY . /root/vid2avatar
-WORKDIR /root/vid2avatar
+# install vid2avatar and its requirements
+RUN cd / && git clone https://github.com/howird/vid2avatar
+WORKDIR /vid2avatar
 RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir -r requirements.docker.txt
-WORKDIR /root/vid2avatar/code
-RUN python setup.py develop
-
-# preprocessing dependencies
-RUN pip install simple-romp scikit-learn
-
-WORKDIR /root/vid2avatar
+RUN pip install --no-cache-dir -r requirements.preprocessing.txt
+RUN cd /vid2avatar/code && python setup.py develop

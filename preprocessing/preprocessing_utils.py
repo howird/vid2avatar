@@ -14,8 +14,11 @@ from pytorch3d.renderer import (
 )
 from pytorch3d.structures import Meshes
 from pytorch3d.renderer.mesh import Textures
+
+
 DEFAULT_DTYPE = torch.float32
 INVALID_TRANS=np.ones(3)*-1
+
 
 def smpl_to_pose(model_type='smplx', use_hands=True, use_face=True,
                      use_face_contour=False, openpose_format='coco25'):
@@ -138,8 +141,8 @@ def smpl_to_pose(model_type='smplx', use_hands=True, use_face=True,
     else:
         raise ValueError('Unknown joint format: {}'.format(openpose_format))
 
+
 def render_trimesh(renderer,mesh,R,T, mode='np'):
-    
     verts = torch.tensor(mesh.vertices).cuda().float()[None]
     faces = torch.tensor(mesh.faces).cuda()[None]
     colors = torch.tensor(mesh.visual.vertex_colors).float().cuda()[None,...,:3]/255
@@ -148,6 +151,7 @@ def render_trimesh(renderer,mesh,R,T, mode='np'):
     image = (255*image).data.cpu().numpy().astype(np.uint8)
     
     return image
+
 
 def estimate_translation_cv2(joints_3d, joints_2d, focal_length=600, img_size=np.array([512.,512.]), proj_mat=None, cam_dist=None):
     if proj_mat is None:
@@ -165,6 +169,7 @@ def estimate_translation_cv2(joints_3d, joints_2d, focal_length=600, img_size=np
         tra_pred = tvec[:,0]            
         return tra_pred
 
+
 class JointMapper(nn.Module):
     def __init__(self, joint_maps=None):
         super(JointMapper, self).__init__()
@@ -180,6 +185,7 @@ class JointMapper(nn.Module):
         else:
             return torch.index_select(joints, 1, self.joint_maps)
 
+
 def transform_mat(R, t):
     ''' Creates a batch of transformation matrices
         Args:
@@ -191,6 +197,7 @@ def transform_mat(R, t):
     # No padding left or right, only add an extra row
     return torch.cat([F.pad(R, [0, 0, 0, 1]),
                       F.pad(t, [0, 0, 0, 1], value=1)], dim=2)
+
 
 # transform SMPL such that the target camera extrinsic will be met
 def transform_smpl(curr_extrinsic, target_extrinsic, smpl_pose, smpl_trans, T_hip):
@@ -205,6 +212,7 @@ def transform_smpl(curr_extrinsic, target_extrinsic, smpl_pose, smpl_trans, T_hi
 
     return target_extrinsic, smpl_pose, smpl_trans
 
+
 class GMoF(nn.Module):
     def __init__(self, rho=1):
         super(GMoF, self).__init__()
@@ -217,6 +225,7 @@ class GMoF(nn.Module):
         squared_res = residual ** 2
         dist = torch.div(squared_res, squared_res + self.rho ** 2)
         return self.rho ** 2 * dist
+
 
 class PerspectiveCamera(nn.Module):
 
@@ -294,13 +303,10 @@ class PerspectiveCamera(nn.Module):
         img_points = torch.einsum('bki,bji->bjk', [camera_mat, img_points]) \
             + self.center.unsqueeze(dim=1)
         return img_points
-    
-class Renderer():
-    
-    def __init__(self, principal_point=None, img_size=None, cam_intrinsic = None):
-    
-        super().__init__()
 
+
+class Renderer():
+    def __init__(self, principal_point=None, img_size=None, cam_intrinsic = None):
         self.device = torch.device("cuda:0")
         torch.cuda.set_device(self.device)
         self.cam_intrinsic = cam_intrinsic
@@ -367,4 +373,3 @@ class Renderer():
                 image_normal = self.renderer(mesh_normal)
                 results.append(image_normal)
             return  torch.cat(results, axis=1)
-

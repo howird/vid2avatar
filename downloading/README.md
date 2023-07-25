@@ -1,6 +1,6 @@
 # Download Frames from YouTube Video
 
-- download the youtube video specifying which seconds of it you want to download 
+- download the youtube video specifying which seconds of it you want to download, here we choose 0-7sec
 ```
 yt-dlp --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss 0 -to 7" "link to video"
 ```

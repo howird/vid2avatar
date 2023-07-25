@@ -33,7 +33,9 @@ def main(args):
     params['model_folder'] = '/openpose/models/'
     params['scale_number'] = 1
     params['scale_gap'] = 0.25
-    params['net_resolution'] = '720x480'
+    params['net_resolution'] = '240x160'
+    params['hand'] = True
+    params['hand_net_resolution'] = '32x32'
 
     # Starting OpenPose
     opWrapper = op.WrapperPython()

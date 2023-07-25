@@ -3,9 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: howird/vid2avatar
     runtime: nvidia
     volumes:
-      - .:/root/vid2avatar
+      - .:/vid2avatar
     ipc: host
     tty: True
     deploy:
